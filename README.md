@@ -24,11 +24,11 @@ Plots each telluric pixel in the model’s database as a block plot. Water tellu
 ```
 CRYSTAL/plot_telluric_range <lo_wavelength> <hi_wavelength>
 ```
-Takes the wavelength range (<lo_wavelength>, <hi_wavelength>) and plots the model’s database's telluric spectrum for an average airmass and PWV within that range. Water telluric pixels are colored blue, non-water pixels are colored red, and composite pixels are colored purple.
+Takes the wavelength range (```<lo_wavelength>```, ```<hi_wavelength>```) and plots the model’s database's telluric spectrum for an average airmass and PWV within that range. Water telluric pixels are colored blue, non-water pixels are colored red, and composite pixels are colored purple.
 
 ```
 CRYSTAL/generate_telluric_model <science spectrum>
 ```
-Takes the science spectrum <science spectrum> and the model database given in the config file and fits the model’s telluric spectrum to the science spectrum.
+Takes the science spectrum ```<science spectrum>``` and the model database given in the config file and fits the model’s telluric spectrum to the science spectrum.
   
 For more information, check out the wiki!
