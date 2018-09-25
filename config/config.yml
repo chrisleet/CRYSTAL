@@ -1,0 +1,209 @@
+# QUICK START
+# Welcome to the config file. If this is your first time using the CRYSTAL
+# telluric modelling protocol, the critical configuration values to set 
+# are:
+#
+# a) cal_spectra_path - the path to the calibration spectra
+# b) cal_output_path - where CRYSTAL should write its output database to
+# c) orders - which orders CRYSTAL should generate a spectrum for
+#
+# For debugging, the plot options plot CRYSTAL's output at various
+# stages of the process and are pretty useful to get an idea of what's 
+# going on. 
+#
+# Chris Leet -  Sept/5/02018
+
+# Runtime Config
+# --------------
+# Path to folder containing calibration spectra.
+cal_spectra_path: "./Spectra/Calibration-CHIRON/"
+
+# Path to folder to read/write telluric database to/from
+cal_db_path: "."
+
+# Name of telluric database to read/write
+cal_db_filename: "example_telluric_db.csv"
+
+# Path to k_threshold database
+threshold_k_db_path: "./config/threshold_k.csv"
+
+# List of orders to correct. Valid inputs are:
+# a) A list of integers between 0-61 inclusive denoting the records to 
+#    correct.
+# b) A string keyword representing a set of orders. Recognized keywords are:
+#    i)   "all" = all orders, equivalent to the list [0, ..., 61]
+#    ii)  "blue" = blue orders (<680nm), equivalent to the list [0, ..., 44]
+#    iii) "red" = red orders (>680nm), equivalent to the list [45, ..., 61]
+orders: [29,43,44]
+
+# The significance level of telluric detection. When p_value = k, CRYSTAL
+# only selects PCCs with a p < k probability of arising by chance. 
+# p_value must be between 0.1 and 0.00001. Note that since single and 
+# double pixel clusters are discarded, assuming that the 
+# Gaussian noise in each pixel is independent, the probability of 
+# generating a false cluster of three pixels is p_value^3. We thus 
+# recommend a low p_value like 0.05 (N.B. 0.05^3 = 0.000125) to
+# minimize false positives.
+p_value: 0.05
+
+# The calibration line/suite of calibration lines to use for water telluric
+# identification. Should be entered as the list [<shard>, <px>] where 
+# <shard> := <order, lo_px hi_px>
+# e.g. [[29, 1500, 1800], 22]
+calibrators:
+    - [[43, 2750, 3200], 199]
+
+reduction_calibrators:
+    - [[29, 1500, 1800], 22]
+    - [[29, 1500, 1800], 61]
+    - [[29, 1500, 1800], 105]
+    - [[29, 1500, 1800], 110]
+    - [[29, 1500, 1800], 178]
+    - [[29, 1500, 1800], 210]
+    - [[43, 2750, 3200], 118]
+    - [[43, 2750, 3200], 142]
+    - [[43, 2750, 3200], 199]
+    - [[43, 2750, 3200], 224]    
+    - [[43, 2750, 3200], 267]
+    - [[43, 2750, 3200], 307]
+    - [[43, 2750, 3200], 317]
+    - [[43, 2750, 3200], 377]
+    - [[44, 1300, 1700], 171]
+    - [[44, 1300, 1700], 226]
+    - [[44, 1300, 1700], 252]
+    - [[44, 1300, 1700], 351]
+    - [[44, 1300, 1700], 375]
+
+# Sets the gradient threshold used for peak identification. If a cluster of
+# pixels' gradient first falls below this threshold and then jumps above it,
+# the cluster of peaks is marked as a peak. Don't change this unless you are
+# sure that you know what you are doing. (There's a extra plot in the peak
+# detection code which you can activate which shows each cluster and whether
+# it is classified as a peak if you want to play around with peak detection.)
+threshold_gradient: 0.005
+
+# Crystal breaks spectrum orders into small chunks and processes the small
+# chunks one at a time. The small chunks are referred to as shards. Sharding
+# orders is useful to cut out certain intractable parts of the spectrum 
+# (e.g. Na-D line, H-alpha line, dead columns of pixels), and makes certain 
+# modules (e.g. baseline fitting) work better. This gives the default ranges
+# of pixels that each order is cut into.
+default_shard_ranges:
+    - [0,550]
+    - [550,1100]
+    - [1100,1500]
+    - [1500,1800]
+    - [1800,2200]
+    - [2200,2750]
+    - [2750,3200]
+
+# Crystal also enables special shard ranges to be set for certain orders (e.g.
+# to cut out the Na-D line). These ranges should be given in the form:
+# - <order> : [range1, range2, range3, ...] (leave blank if no orders have
+# shard ranges.)
+special_shard_ranges:
+    13 : [[0, 550]]
+#    14 : [[550, 1100]]
+    29 : [[1500, 1800]] 
+#    30 : [[550, 1100]]
+#    35 : [[1550, 2200]] 
+    43 : [[2750, 3200]] 
+    44 : [[1300, 1700]] 
+
+# Set the range of pixel shifts Crystal will x-correlate the telluric spectrum
+# with the science spectrum. Crystal will examine shifts from -x_corr_shift to
+# x_corr_shift
+x_corr_shift: 20
+
+# Crystal only returns values for lines below a certain depth on a given night.
+# This is useful because on dry nights or at shallow airmasses, some water or
+# non-water lines shrink to close to 0 and can be neglected, allowing as much
+# data as possible to be preserved. Set this to 0 to neglect no lines, no 
+# matter how weak. Line depth is measured in linear space.
+#
+#  1.0 -| xxxxx       xxxxx
+#       |     x     x ^
+#  0.9 -|      x   x  | <- This distance, where spectrum baseline
+#       |       x x   |    normalized to 1.0, in linear space
+#  0.8 -|        x    V
+#
+min_model_depth: 0
+
+# Set the range of value of mu to fit to. Mu is the depth of the water
+# calibrator line in the science spectrum. Since the calibrator line
+# may be blended with other lines, we estimate mu from the depths of
+# other water lines.
+lo_mu: -1.0
+hi_mu: 0.0
+
+# Set the accuracy to compute mu to. When the range of possible mus
+# has been lowered below this value, fitting will stop.
+mu_epsilon: 0.001
+
+
+# Fits File Config
+# ----------------
+# Stores characteristics of fits file to load
+
+# Pixels in 1 order of the fits file
+pixels_per_order : 3200
+
+# Debugging Plots
+# ---------------
+# These options plot the calibration process's workings at each of its stages.
+# Useful for debugging or for general interest.
+
+# i. Preprocessing plots
+
+# Plot the spectra by order in log space.
+plot_spectra_by_order: False
+# Plot the spectra by shard in log space.
+plot_spectra_by_shard: False
+# Plot each shard after normalization.
+plot_normalized_shards: False
+
+# ii. Pixel classification plots
+
+# Plot each shard with pixels colored by water PCC
+plot_water_PCCs: False
+# Plot each shard colored by water PCC with signficant pixels highlighted.
+plot_water_PCCs_flag_sig: False
+# Plot each shard colored by water PCC with significant pixels highlighted 
+# after false positive removal and after the neighbouring pixels to each
+# tellurics have been added to it to get the cluster's line's tail.
+plot_water_PCCs_flag_sig_no_fp: False
+# Plot each shard with pixels colored by z PCC
+plot_z_PCCs: False
+# Plot each shard colored by z PCC with signficant pixels highlighted.
+plot_z_PCCs_flag_sig: False
+# Plot each shard colored by z PCC with significant pixels highlighted 
+# after FP removal and after the neighbouring pixels to each
+# tellurics have been added to it to get the cluster's line's tail.
+plot_z_PCCs_flag_sig_no_fp: False
+# Plot each shard with pixels colored by their classification. Airmass pixels
+# are colored red, water pixels are colored blue, and composite pixels are 
+# colored lilac.
+plot_px_classification: False
+
+# iii. Regression model plots
+# Plot each pixel given below's regression model with its calibrator.
+plot_regression_models: False
+# A list of the pixels whose regression models should be plotted when 
+# plot_regression_models is True. Each pixel is designated by the list
+# [<shard>, <px>] where
+# <shard> := <order, lo_px hi_px>
+regression_model_px:
+   - [[29, 1500, 1800], 110]
+   - [[35, 1550, 2200], 448] 
+
+# iv. Fitting plots
+# Plot the spectrum to fit by order in log space.
+plot_fspectrum_by_order: False
+# Plot the spectrum to fit by shard in log space.
+plot_fspectrum_by_shard: False
+# Plot each shard in the spectrum to fit after normalization.
+plot_normalized_fshards: False
+# Plot each shard in the spectrum to fit against the normalized telluric model.
+plot_fspectrum_model_xcorr: False
+# Plot each shard in the spectrum to fit against the fitted telluric model.
+plot_fspectrum_model_fitted: False
