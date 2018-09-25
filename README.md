@@ -29,6 +29,6 @@ Takes the wavelength range (```<lo_wavelength>```, ```<hi_wavelength>```) and pl
 ```
 CRYSTAL/generate_telluric_model <science spectrum>
 ```
-Takes the science spectrum ```<science spectrum>``` and the model database given in the config file and fits the model’s telluric spectrum to the science spectrum. Returns the fitted model as the csv file: ```<science spectrum>_tel.fits```
+Takes the science spectrum ```<science spectrum>``` and the model database given in the config file and fits the model’s telluric spectrum to the science spectrum. Returns the fitted model as the csv file: ```<science spectrum>_tel.fits```.
   
 For more information, check out the wiki!
